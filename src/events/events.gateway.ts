@@ -1,6 +1,7 @@
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
+  SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
@@ -17,5 +18,10 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   handleDisconnect(client: Socket) {
     console.log(`client disconnected: ${client.id}`);
+  }
+
+  @SubscribeMessage('sensor')
+  handleEvent(client: Socket, data: string): void {
+    console.log(`[*] sensor::${client.id}::${JSON.stringify(data)}`);
   }
 }
