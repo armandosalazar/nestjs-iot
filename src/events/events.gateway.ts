@@ -1,4 +1,6 @@
 import {
+  ConnectedSocket,
+  MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
   SubscribeMessage,
@@ -8,7 +10,11 @@ import {
 import { Server, Socket } from 'socket.io';
 import { spawn } from 'child_process';
 
-@WebSocketGateway()
+@WebSocketGateway({
+  cors: {
+    origin: '*',
+  },
+})
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
@@ -22,7 +28,10 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('sensor')
-  handleEvent(client: Socket, data: string): void {
+  handleSensor(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: string,
+  ): void {
     const { humidity, temperatureCelsius } = JSON.parse(JSON.stringify(data));
 
     const process = spawn('python3', [
@@ -34,6 +43,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     process.stdout.on('data', (data) => {
       const dataObj = JSON.parse(JSON.stringify(data.toString()));
       console.table(dataObj);
+      client.broadcast.emit('sensor', dataObj);
       // console.log(`stdout: ${data}`);
     });
     process.stderr.on('data', (data) => {
