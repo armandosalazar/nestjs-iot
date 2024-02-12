@@ -42,6 +42,6 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     process.on('close', (code) => {
       if (code !== 0) console.log(`child process exited with code ${code}`);
     });
-    console.log(`[*] sensor::${client.id}::${JSON.stringify(data)}`);
+    // console.log(`[*] sensor::${client.id}::${JSON.stringify(data)}`);
   }
 }

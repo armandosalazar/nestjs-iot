@@ -1,23 +1,18 @@
+import sys
 from joblib import load
 
-import sys
-args = sys.argv[1:]
-
-humidity = int(args[0])
-temperature = round(float(args[1]), 2)
+humidity = int(sys.argv[1])
+temperature = round(float(sys.argv[2]), 2)
 
 weather_model = load('models/weather.joblib')
 precipitation_model = load('models/precipitation.joblib')
 
-predictions = {
-    'weather': list(weather_model.predict([[humidity, temperature]])[0]),
-    'precipitation': precipitation_model.predict([[humidity, temperature]])[0]
-}
-
 data = {
     'humidity': humidity,
     'temperature': temperature,
-    'predictions': predictions
+    'weather': list(weather_model.predict([[humidity, temperature]])[0])[0],
+    'description': list(weather_model.predict([[humidity, temperature]])[0])[1],
+    'precipitation': round(precipitation_model.predict([[humidity, temperature]])[0], 2)
 }
 
 print(data, end='')
